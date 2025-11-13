@@ -1,10 +1,9 @@
 import os
-from flask import Flask, render_template, redirect, request
-import pandas as pd
+from flask import Flask, render_template, redirect
+from openpyxl import load_workbook
 
 app = Flask(__name__)
 
-# Milestone thresholds
 MINIFIG_THRESHOLDS = [
     (150, "Grand Master"),
     (80, "Platinum"),
@@ -28,53 +27,84 @@ def get_tier(value, thresholds):
             return name
     return thresholds[-1][1]
 
-# Load Excel
 def load_data():
-    df = pd.read_excel("hall_of_fame.xlsx")
+    path = "hall_of_fame.xlsx"
+    if not os.path.exists(path):
+        return []
 
-    if 'Total_Points' in df.columns:
-        df['Total_Points'] = pd.to_numeric(df['Total_Points'], errors='coerce').fillna(0).astype(int)
-    else:
-        df['Total_Points'] = 0
+    wb = load_workbook(path, data_only=True)
+    ws = wb.active
 
-    if 'Total_Minifigs' in df.columns:
-        df['Total_Minifigs'] = pd.to_numeric(df['Total_Minifigs'], errors='coerce').fillna(0).astype(int)
-    else:
-        df['Total_Minifigs'] = 0
+    # Try to detect header positions, fall back to defaults
+    headers = [str(c.value).strip() if c.value is not None else "" for c in next(ws.iter_rows(min_row=1, max_row=1))]
+    def idx(name, fallback):
+        try:
+            return headers.index(name)
+        except ValueError:
+            return fallback
 
-    df = df.fillna("—")
-
-    df['Points_Tier'] = df['Total_Points'].apply(lambda v: get_tier(v, POINTS_THRESHOLDS))
-    df['Minifig_Tier'] = df['Total_Minifigs'].apply(lambda v: get_tier(v, MINIFIG_THRESHOLDS))
+    # common header names; adjust if your sheet differs
+    i_rank = idx("Rank", 0)
+    i_profile = idx("ProfileImage", 1)
+    i_name = idx("CollectorName", 2)
+    i_nick = idx("Nickname", 3)
+    i_minifigs = idx("Total_Minifigs", 4)
+    i_points = idx("Total_Points", 5)
+    i_title = idx("Special_Title", 6)
 
     tier_order = ["Beginner", "Bronze", "Silver", "Gold", "Platinum", "Grand Master"]
-    rank = {t: i for i, t in enumerate(tier_order)}
+    rank_map = {t: i for i, t in enumerate(tier_order)}
 
-    def overall_tier(row):
-        p = row['Points_Tier']
-        m = row['Minifig_Tier']
-        return p if rank[p] >= rank[m] else m
+    data = []
+    for row in ws.iter_rows(min_row=2, values_only=True):
+        def val(i):
+            try:
+                v = row[i]
+            except Exception:
+                v = None
+            return v if v is not None else "—"
 
-    df['Overall_Tier'] = df.apply(overall_tier, axis=1)
+        try:
+            minifigs = int(row[i_minifigs] or 0)
+        except Exception:
+            minifigs = 0
+        try:
+            points = int(row[i_points] or 0)
+        except Exception:
+            points = 0
 
-    def tier_source(row):
-        return 'Points' if rank[row['Points_Tier']] >= rank[row['Minifig_Tier']] else 'Minifigs'
+        points_tier = get_tier(points, POINTS_THRESHOLDS)
+        minifig_tier = get_tier(minifigs, MINIFIG_THRESHOLDS)
+        overall = points_tier if rank_map[points_tier] >= rank_map[minifig_tier] else minifig_tier
+        source = "Points" if rank_map[points_tier] >= rank_map[minifig_tier] else "Minifigs"
 
-    df['Tier_Source'] = df.apply(tier_source, axis=1)
+        record = {
+            "Rank": val(i_rank),
+            "ProfileImage": val(i_profile),
+            "CollectorName": val(i_name),
+            "Nickname": val(i_nick),
+            "Total_Minifigs": minifigs,
+            "Total_Points": points,
+            "Special_Title": val(i_title),
+            "Points_Tier": points_tier,
+            "Minifig_Tier": minifig_tier,
+            "Overall_Tier": overall,
+            "Tier_Source": source
+        }
+        data.append(record)
 
-    return df
+    return data
 
 @app.route('/')
 def home():
-    df = load_data().sort_values(by='Total_Points', ascending=False)
-    top3 = df.head(3).to_dict(orient='records')
-    return render_template('home.html', top3=top3)
+    data = sorted(load_data(), key=lambda x: x["Total_Points"], reverse=True)
+    top3 = data[:3]
+    return render_template("home.html", top3=top3)
 
 @app.route('/top-collectors')
 def top_collectors():
-    df = load_data().sort_values(by='Total_Points', ascending=False)
-    data = df.to_dict(orient='records')
-    return render_template('top_collectors.html', collectors=data)
+    data = sorted(load_data(), key=lambda x: x["Total_Points"], reverse=True)
+    return render_template("top_collectors.html", collectors=data)
 
 @app.route('/submit')
 def submit():
@@ -82,8 +112,8 @@ def submit():
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    return render_template("about.html")
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=False)
