@@ -5,17 +5,17 @@ from openpyxl import load_workbook
 app = Flask(__name__)
 
 MINIFIG_THRESHOLDS = [
-    (150, "Grand Master"),
-    (80, "Platinum"),
-    (40, "Gold"),
-    (20, "Silver"),
-    (10, "Bronze"),
+    (250, "Grand Master"),
+    (150, "Platinum"),
+    (100, "Gold"),
+    (50, "Silver"),
+    (20, "Bronze"),
     (0, "Beginner")
 ]
 POINTS_THRESHOLDS = [
-    (800, "Grand Master"),
-    (400, "Platinum"),
-    (200, "Gold"),
+    (500, "Grand Master"),
+    (375, "Platinum"),
+    (250, "Gold"),
     (100, "Silver"),
     (50, "Bronze"),
     (0, "Beginner")

@@ -6,7 +6,7 @@
 
 /* Centered logo + centered nav (matches provided mock) */
 .brand-logo img {
-  height: 66px; /* match mock proportion; adjust if needed */
+  height: 120px; /* match mock proportion; adjust if needed */
   display: block;
   margin: 0 auto;
 }
@@ -45,6 +45,7 @@
 /* Slight spacing / container styling to mimic centered card area */
 header {
   background: transparent;
+
 }
 
 /* Footer social icons */
@@ -59,16 +60,18 @@ header {
 .footer-social a { display: inline-block; line-height: 0; }
 
 .social-icon {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   object-fit: contain;
   opacity: 0.95;
-  transition: transform .12s ease, opacity .12s ease, filter .12s ease;
+  transition: transform .15s ease, opacity .15s ease, filter .15s ease, width .15s ease, height .15s ease;
   filter: grayscale(0.15) brightness(0.95);
 }
 
 .social-icon:hover {
-  transform: translateY(-3px) scale(1.05);
+  width: 40px;
+  height: 40px;
+  transform: translateY(-3px);
   opacity: 1;
   filter: none;
 }
@@ -79,7 +82,7 @@ header {
     flex-wrap: wrap;
   }
   .brand-logo img {
-    height: 56px;
+    height: 100px;
   }
 }
 
