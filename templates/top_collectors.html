@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4 text-center fw-bold">Top Collectors</h2>
+<table class="table table-striped text-center">
+  <thead class="table-gold">
+    <tr>
+      <th>Rank</th><th>Name</th><th>Nickname</th><th>Minifigs</th><th>Points</th><th>Special Title</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in collectors %}
+    <tr>
+      <td>{{ c['Rank'] }}</td>
+      <td>{{ c['CollectorName'] }}</td>
+      <td>{{ c['Nickname'] }}</td>
+      <td>{{ c['Total_Minifigs'] }}</td>
+      <td>{{ c['Total_Points'] }}</td>
+      <td>{{ c['Special_Title'] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

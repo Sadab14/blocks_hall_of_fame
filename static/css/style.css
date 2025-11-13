@@ -1,0 +1,89 @@
+.text-gold { color: #d4af37; }
+.border-gold { border: 2px solid #d4af37; border-radius: 10px; }
+.btn-gold { background-color: #d4af37; color: white; border-radius: 8px; padding: 10px 20px; }
+.btn-gold:hover { background-color: #bfa02d; color: white; }
+.table-gold { background-color: #fff8e1; color: #d4af37; }
+
+/* Centered logo + centered nav (matches provided mock) */
+.brand-logo img {
+  height: 66px; /* match mock proportion; adjust if needed */
+  display: block;
+  margin: 0 auto;
+}
+
+/* Nav link layout */
+.nav-links {
+  gap: 34px;
+  padding-left: 0;
+  margin-bottom: 0;
+  margin-top: 8px;
+  list-style: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Link styling: subtle gold palette, uppercase, small */
+.nav-links .nav-link {
+  color: #6b5a49;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  padding: 6px 4px;
+  border-bottom: 3px solid transparent;
+  transition: color .15s ease, border-color .15s ease;
+}
+
+/* Active and hover states */
+.nav-links .nav-link:hover,
+.nav-links .nav-link.active {
+  color: #8a6329;
+  border-bottom-color: #d4af37; /* gold underline */
+}
+
+/* Slight spacing / container styling to mimic centered card area */
+header {
+  background: transparent;
+}
+
+/* Footer social icons */
+.footer-social {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.footer-social a { display: inline-block; line-height: 0; }
+
+.social-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  opacity: 0.95;
+  transition: transform .12s ease, opacity .12s ease, filter .12s ease;
+  filter: grayscale(0.15) brightness(0.95);
+}
+
+.social-icon:hover {
+  transform: translateY(-3px) scale(1.05);
+  opacity: 1;
+  filter: none;
+}
+
+@media (max-width: 576px) {
+  .nav-links {
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .brand-logo img {
+    height: 56px;
+  }
+}
+
+@media (max-width: 480px) {
+  .social-icon { width: 24px; height: 24px; }
+  .footer-social { gap: 12px; }
+}
