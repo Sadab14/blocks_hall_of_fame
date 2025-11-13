@@ -59,8 +59,8 @@ header {
 .footer-social a { display: inline-block; line-height: 0; }
 
 .social-icon {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   opacity: 0.95;
   transition: transform .12s ease, opacity .12s ease, filter .12s ease;
