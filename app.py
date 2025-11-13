@@ -32,7 +32,6 @@ def get_tier(value, thresholds):
 def load_data():
     df = pd.read_excel("hall_of_fame.xlsx")
 
-    # Ensure numeric columns exist and are numeric for tier calculations
     if 'Total_Points' in df.columns:
         df['Total_Points'] = pd.to_numeric(df['Total_Points'], errors='coerce').fillna(0).astype(int)
     else:
@@ -43,14 +42,11 @@ def load_data():
     else:
         df['Total_Minifigs'] = 0
 
-    # Fill other missing values with a dash for display
     df = df.fillna("—")
 
-    # Compute tiers
     df['Points_Tier'] = df['Total_Points'].apply(lambda v: get_tier(v, POINTS_THRESHOLDS))
     df['Minifig_Tier'] = df['Total_Minifigs'].apply(lambda v: get_tier(v, MINIFIG_THRESHOLDS))
 
-    # Determine an overall tier (higher of the two)
     tier_order = ["Beginner", "Bronze", "Silver", "Gold", "Platinum", "Grand Master"]
     rank = {t: i for i, t in enumerate(tier_order)}
 
@@ -61,7 +57,6 @@ def load_data():
 
     df['Overall_Tier'] = df.apply(overall_tier, axis=1)
 
-    # Record which metric determined the overall tier
     def tier_source(row):
         return 'Points' if rank[row['Points_Tier']] >= rank[row['Minifig_Tier']] else 'Minifigs'
 
