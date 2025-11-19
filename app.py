@@ -117,7 +117,7 @@ def about():
 @app.route('/sheet')
 def sheet():
     try:
-        return render_template('sheet3.html')
+        return render_template('Sheet3.html')
     except Exception as e:
         return f"Error loading sheet: {str(e)}", 500
 
