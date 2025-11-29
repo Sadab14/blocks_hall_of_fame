@@ -1,6 +1,7 @@
 import os
 from flask import Flask, render_template, redirect
 from openpyxl import load_workbook
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -44,16 +45,13 @@ def load_data():
             return fallback
 
     # common header names; adjust if your sheet differs
-    i_rank = idx("Rank", 0)
     i_profile = idx("ProfileImage", 1)
     i_name = idx("CollectorName", 2)
     i_nick = idx("Nickname", 3)
     i_minifigs = idx("Total_Minifigs", 4)
     i_points = idx("Total_Points", 5)
     i_title = idx("Special_Title", 6)
-
-    tier_order = ["Beginner", "Bronze", "Silver", "Gold", "Platinum", "Grand Master"]
-    rank_map = {t: i for i, t in enumerate(tier_order)}
+    i_last_updated = idx("LastUpdated", 7)
 
     data = []
     for row in ws.iter_rows(min_row=2, values_only=True):
@@ -75,11 +73,19 @@ def load_data():
 
         points_tier = get_tier(points, POINTS_THRESHOLDS)
         minifig_tier = get_tier(minifigs, MINIFIG_THRESHOLDS)
-        overall = points_tier if rank_map[points_tier] >= rank_map[minifig_tier] else minifig_tier
-        source = "Points" if rank_map[points_tier] >= rank_map[minifig_tier] else "Minifigs"
+        overall = points_tier if points_tier >= minifig_tier else minifig_tier
+        source = "Points" if points_tier >= minifig_tier else "Minifigs"
+        
+        last_updated = val(i_last_updated)
+        if last_updated != "—" and last_updated:
+            try:
+                # Parse the date and format as dd-mm-yyyy
+                date_obj = datetime.strptime(str(last_updated).split()[0], "%Y-%m-%d")
+                last_updated = date_obj.strftime("%d-%m-%Y")
+            except:
+                last_updated = str(last_updated).split()[0]
 
         record = {
-            "Rank": val(i_rank),
             "ProfileImage": val(i_profile),
             "CollectorName": val(i_name),
             "Nickname": val(i_nick),
@@ -89,21 +95,44 @@ def load_data():
             "Points_Tier": points_tier,
             "Minifig_Tier": minifig_tier,
             "Overall_Tier": overall,
-            "Tier_Source": source
+            "Tier_Source": source,
+            "LastUpdated": last_updated
         }
         data.append(record)
 
-    return data
+    # Sort by Overall_Tier rank (highest first), then by Total_Points as tiebreaker
+    tier_order = ["Beginner", "Bronze", "Silver", "Gold", "Platinum", "Grand Master"]
+    rank_map = {t: i for i, t in enumerate(tier_order)}
+
+    sorted_data = sorted(data, key=lambda x: (
+        -rank_map.get(x["Overall_Tier"], 0),
+        -x["Total_Points"]
+    ))
+
+    for idx, record in enumerate(sorted_data, start=1):
+        record["Rank"] = idx
+        
+        # Assign badge image based on rank
+        if idx == 1:
+            record["ProfileImage"] = "profile gold.jpg"
+        elif idx == 2:
+            record["ProfileImage"] = "profile silver.jpg"
+        elif idx == 3:
+            record["ProfileImage"] = "profile bronze.jpg"
+        else:
+            record["ProfileImage"] = "profile normal.jpg"
+
+    return sorted_data
 
 @app.route('/')
 def home():
-    data = sorted(load_data(), key=lambda x: x["Total_Points"], reverse=True)
+    data = load_data()
     top3 = data[:3]
     return render_template("home.html", top3=top3)
 
 @app.route('/top-collectors')
 def top_collectors():
-    data = sorted(load_data(), key=lambda x: x["Total_Points"], reverse=True)
+    data = load_data()
     return render_template("top_collectors.html", collectors=data)
 
 @app.route('/submit')

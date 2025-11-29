@@ -10,6 +10,7 @@
   <div class="col-md-3 m-2 card border-gold p-3 text-center">
       <h4 class="text-gold fw-bold">RANK #{{ c['Rank'] }}</h4>
       <img src="{{ url_for('static', filename='images/' + c['ProfileImage']) }}" class="img-fluid rounded-circle mb-2 mx-auto d-block" width="100" alt="{{ c['CollectorName'] }}">
+      <!--<img src="{{ url_for('static', filename='images/' + c['ProfileImage']) }}" class="img-fluid rounded-circle mb-2 mx-auto d-block" width="100" alt="{{ c['CollectorName'] }}">-->
       <h5>{{ c['CollectorName'] }}</h5>
 
       {# Show overall milestone and which metric produced it #}

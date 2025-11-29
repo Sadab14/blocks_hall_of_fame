@@ -4,7 +4,7 @@
 <table class="table table-striped text-center">
   <thead class="table-gold">
     <tr>
-      <th>Rank</th><th>Name</th><th>Tag</th><th>Minifigs</th><th>Points</th><th>Special Title</th>
+      <th>Rank</th><th>Name</th><th>Tag</th><th>Minifigs</th><th>Points</th><th>Special Title</th><th>Last Updated</th>
     </tr>
   </thead>
   <tbody>
@@ -16,6 +16,7 @@
       <td>{{ c['Total_Minifigs'] }}</td>
       <td>{{ c['Total_Points'] }}</td>
       <td>{{ c['Special_Title'] }}</td>
+      <td>{{ c['LastUpdated'] }}</td>
     </tr>
     {% endfor %}
   </tbody>
