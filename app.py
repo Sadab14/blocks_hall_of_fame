@@ -139,9 +139,9 @@ def top_collectors():
 def submit():
     return redirect("https://forms.gle/5wYMhzYjZS9vY9Sv8")
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
+@app.route('/rulebook')
+def rulebook():
+    return render_template('rulebook.html')
 
 @app.route('/sheet')
 def sheet():
