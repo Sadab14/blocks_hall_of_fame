@@ -19,7 +19,7 @@ POINTS_THRESHOLDS = [
     (250, "Gold"),
     (100, "Silver"),
     (50, "Bronze"),
-    (0, "Beginner")
+    (25, "Beginner")
 ]
 
 def get_tier(value, thresholds):
